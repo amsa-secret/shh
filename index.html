@@ -73,6 +73,8 @@
             justify-content: center;
             gap: 30px;
             margin-bottom: 30px;
+            position: relative;
+            min-height: 120px;
         }
 
         .btn {
@@ -85,6 +87,7 @@
             transition: all 0.3s ease;
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
             min-width: 180px;
+            position: relative;
         }
 
         .btn-yes {
@@ -100,7 +103,7 @@
         .btn-no {
             background-color: #ff4d6d;
             color: white;
-            position: relative;
+            position: absolute;
         }
 
         .btn-no:hover {
@@ -179,6 +182,7 @@
             
             .buttons-container {
                 gap: 20px;
+                min-height: 110px;
             }
             
             .message {
@@ -212,6 +216,12 @@
             .buttons-container {
                 flex-direction: column;
                 align-items: center;
+                min-height: 200px;
+            }
+            
+            .btn-no {
+                position: relative;
+                margin-top: 10px;
             }
         }
 
@@ -224,6 +234,19 @@
 
         .celebrate {
             animation: celebrate 0.5s ease 3;
+        }
+        
+        /* Shake animation for the no button */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+            100% { transform: translateX(0); }
+        }
+        
+        .shake {
+            animation: shake 0.5s ease;
         }
     </style>
 </head>
@@ -248,7 +271,7 @@
         
         <div class="hearts-container" id="heartsContainer"></div>
         
-        <p class="instructions">Try clicking the NO button to see what happens... but we both know you'll click YES! ??</p>
+        <p class="instructions">Try clicking the NO button to see what happens... but we both know you'll click YES! ❤️</p>
     </div>
 
     <script>
@@ -256,16 +279,16 @@
         const noMessages = [
             "Are you sure?",
             "Why :(",
-            "We can try again ??",
-            "Please reconsider?",
-            "I'll be really sad...",
-            "But I made this for you!",
-            "Think about it again?",
-            "You're breaking my heart ??",
+            "We can try again ☹️",
+            "i literally walk with u daily",
+            "I'll cry if you say no",
+            "I kinda made this for you!",
+            "pls think about it again?",
+            "you're breaking my heart 💔",
             "Just give me a chance!",
-            "Okay, last chance...",
-            "Pretty please?",
-            "I'll be the best Valentine!"
+            "id rather you throw water at me :(",
+            "pretty please?",
+            "pleaseee mommmyyyyyyyyyy"
         ];
         
         let noClickCount = 0;
@@ -274,9 +297,16 @@
         const messageEl = document.getElementById('message');
         const finalMessageEl = document.getElementById('finalMessage');
         const heartsContainer = document.getElementById('heartsContainer');
+        const buttonsContainer = document.querySelector('.buttons-container');
         
         // Handle clicks on the "no" button
         noBtn.addEventListener('click', function() {
+            // Add shake animation
+            noBtn.classList.add('shake');
+            setTimeout(() => {
+                noBtn.classList.remove('shake');
+            }, 500);
+            
             // Change the text of the button
             if (noClickCount < noMessages.length) {
                 noBtn.textContent = noMessages[noClickCount];
@@ -287,15 +317,24 @@
                 const currentSize = 1.8 - (noClickCount * 0.08);
                 noBtn.style.fontSize = `${currentSize}rem`;
                 
-                // Move the button to a random position (but keep it on screen)
-                const maxX = window.innerWidth - noBtn.offsetWidth - 40;
-                const maxY = window.innerHeight - noBtn.offsetHeight - 40;
-                const randomX = Math.floor(Math.random() * maxX);
-                const randomY = Math.floor(Math.random() * maxY);
+                // Move the button to a random position within the container
+                const containerWidth = buttonsContainer.offsetWidth;
+                const containerHeight = buttonsContainer.offsetHeight;
+                const btnWidth = noBtn.offsetWidth;
+                const btnHeight = noBtn.offsetHeight;
                 
-                noBtn.style.position = "absolute";
-                noBtn.style.left = `${randomX}px`;
-                noBtn.style.top = `${randomY}px`;
+                // Calculate max positions to keep button fully visible
+                const maxX = containerWidth - btnWidth - 20;
+                const maxY = containerHeight - btnHeight - 20;
+                
+                // Only move if there's space to move
+                if (maxX > 0 && maxY > 0) {
+                    const randomX = Math.floor(Math.random() * maxX);
+                    const randomY = Math.floor(Math.random() * maxY);
+                    
+                    noBtn.style.left = `${randomX}px`;
+                    noBtn.style.top = `${randomY}px`;
+                }
                 
                 noClickCount++;
                 
@@ -307,7 +346,7 @@
             if (noClickCount >= noMessages.length) {
                 noBtn.textContent = "Okay, I give up";
                 noBtn.disabled = true;
-                messageEl.textContent = "The NO button surrendered! Now click YES! ??";
+                messageEl.textContent = "The NO button surrendered! Now click YES! ❤️";
                 messageEl.style.color = "#4CAF50";
             }
         });
@@ -389,17 +428,26 @@
             }
         }
         
-        // Make the "no" button move when hovered (for desktop)
+        // Make the "no" button move when hovered (for desktop) - but within container
         noBtn.addEventListener('mouseover', function() {
-            if (window.innerWidth > 768 && noClickCount > 0) {
-                const maxX = window.innerWidth - noBtn.offsetWidth - 40;
-                const maxY = window.innerHeight - noBtn.offsetHeight - 40;
-                const randomX = Math.floor(Math.random() * maxX);
-                const randomY = Math.floor(Math.random() * maxY);
+            if (window.innerWidth > 768 && noClickCount > 0 && !noBtn.disabled) {
+                const containerWidth = buttonsContainer.offsetWidth;
+                const containerHeight = buttonsContainer.offsetHeight;
+                const btnWidth = noBtn.offsetWidth;
+                const btnHeight = noBtn.offsetHeight;
                 
-                noBtn.style.position = "absolute";
-                noBtn.style.left = `${randomX}px`;
-                noBtn.style.top = `${randomY}px`;
+                // Calculate max positions to keep button fully visible
+                const maxX = containerWidth - btnWidth - 20;
+                const maxY = containerHeight - btnHeight - 20;
+                
+                // Only move if there's space to move
+                if (maxX > 0 && maxY > 0) {
+                    const randomX = Math.floor(Math.random() * maxX);
+                    const randomY = Math.floor(Math.random() * maxY);
+                    
+                    noBtn.style.left = `${randomX}px`;
+                    noBtn.style.top = `${randomY}px`;
+                }
                 
                 // Create a few hearts on hover
                 if (noClickCount < noMessages.length) {
